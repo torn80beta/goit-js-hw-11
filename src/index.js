@@ -67,7 +67,7 @@ function drawCards(data) {
         </div>`
     )
     .join('');
-  console.log(markup);
+  //console.log(markup);
   refs.galleryEl.insertAdjacentHTML('beforeend', markup);
 }
 
@@ -77,5 +77,12 @@ function onFormSubmit(e) {
   const url = `${BASE_URL}?key=${API_KEY}&q=${searchQuery}&image_type=photo&orientation=horizontal`;
   fetchUrl(url).then(data => {
     drawCards(data);
+    const { height: cardHeight } = document
+      .querySelector('.gallery')
+      .firstElementChild.getBoundingClientRect();
+    window.scrollBy({
+      top: cardHeight * 3,
+      behavior: 'smooth',
+    });
   });
 }
