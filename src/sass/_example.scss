@@ -108,3 +108,36 @@ input {
   border: #777371 solid 1px;
   border-radius: 4px;
 }
+
+
+.gallery{
+  display: flex;
+  justify-content: space-around;
+  /* align-items: center; */
+  flex-wrap: wrap;
+  gap: 30px;
+  padding: 30px;
+}
+
+.photo-card {
+  display: flex;
+  flex-direction: column;
+  justify-content:space-between;
+  width: 300px;
+  height: 365px;
+}
+
+.image {
+  width: auto;
+  height: 100%;
+  object-fit: cover;
+  overflow: hidden;
+}
+
+.info{
+  height: 160px;
+}
+
+.info-item {
+  color: #fff;
+}
