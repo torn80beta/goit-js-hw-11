@@ -1,2 +1,0 @@
-({formEl:document.querySelector(".search-form"),buttonEl:document.querySelector(".button")}).formEl.addEventListener("submit",(function(e){e.preventDefault();const t=e.currentTarget.searchQuery.value;o=`https://pixabay.com/api/?key=34120463-e7776ce011157a1f3e137c765&q=${t}&image_type=photo&orientation=horizontal`,fetch(o).then((e=>e.json())).then((e=>(console.log(e),e))).then((e=>{0===e.hits.length&&console.log("Sorry, there are no images matching your search query. Please try again.")}));var o}));
-//# sourceMappingURL=index.011e1de2.js.map
