@@ -1,3 +1,5 @@
+import { Notify } from 'notiflix/build/notiflix-notify-aio';
+
 const API_KEY = '34120463-e7776ce011157a1f3e137c765';
 const BASE_URL = 'https://pixabay.com/api/';
 // const searchParams = {
@@ -12,9 +14,12 @@ const refs = {
   galleryEl: document.querySelector('.gallery'),
 };
 
-refs.formEl.addEventListener('submit', onFormSubmit);
+const notiflixParams = {
+  position: 'center-top',
+  distance: '60px',
+};
 
-//const searchQuery = 'sea';
+refs.formEl.addEventListener('submit', onFormSubmit);
 
 //&safesearch=true
 
@@ -25,14 +30,13 @@ async function fetchUrl(targetUrl) {
     .then(response => {
       //console.log(response);
       data = [...response.hits];
-
       return data;
     })
     .then(response => {
       if (response.length === 0) {
-        console.log(
-          response,
-          'Sorry, there are no images matching your search query. Please try again.'
+        Notify.failure(
+          'Sorry, there are no images matching your search query. Please try again.',
+          notiflixParams
         );
       }
     });
