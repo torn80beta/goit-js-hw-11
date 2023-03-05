@@ -114,8 +114,8 @@ function onFormSubmit(e) {
   e.preventDefault();
   refs.galleryEl.innerHTML = '';
   loadMoreButton.show();
-  const search = new UrlCreator().getUrl();
-  fetchUrl(search).then(data => {
+  const url = new UrlCreator().getUrl();
+  fetchUrl(url).then(data => {
     drawCards(data);
     const { height: cardHeight } = document
       .querySelector('.gallery')
