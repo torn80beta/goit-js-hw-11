@@ -1,85 +1,54 @@
 import { Notify } from 'notiflix/build/notiflix-notify-aio';
 import MoreButton from './js/more-button';
-// const API_KEY = '34120463-e7776ce011157a1f3e137c765';
-// const BASE_URL = 'https://pixabay.com/api/';
-
+import UrlCreator from './js/url-creator';
+const loadMoreButton = new MoreButton();
+const urlCreator = new UrlCreator();
 const refs = {
   formEl: document.querySelector('.search-form'),
-  buttonEl: document.querySelector('.button'),
   galleryEl: document.querySelector('.gallery'),
 };
-
 const notiflixParams = {
-  position: 'center-top',
-  distance: '60px',
+  position: 'center-center',
 };
-const loadMoreButton = new MoreButton();
 
 refs.formEl.addEventListener('submit', onFormSubmit);
-// loadMoreButton.addEventListener('click', onLoadMore);
+loadMoreButton.button.addEventListener('click', onLoadMore);
 
-class UrlCreator {
-  constructor() {
-    this.page = 1;
-    this.refs = this.getRefs();
-    this.searchQuery = this.getQuery();
-    this.API_KEY = '34120463-e7776ce011157a1f3e137c765';
-    this.BASE_URL = 'https://pixabay.com/api/';
-  }
-
-  getRefs() {
-    const refs = {};
-    refs.searchForm = document.querySelector('.search-form');
-    return refs;
-  }
-
-  getUrl() {
-    const url = `${this.BASE_URL}?key=${this.API_KEY}&q=${this.searchQuery}&image_type=photo&orientation=horizontal&per_page=10&page=${this.page}`;
-    return url;
-  }
-
-  getQuery() {
-    const searchQuery = this.refs.searchForm.searchQuery.value;
-    return searchQuery;
-  }
+function onLoadMore() {
+  urlCreator.incrementPage();
+  fetchUrl(urlCreator.getUrl()).then(data => {
+    drawCards(data);
+    scroll();
+  });
+  //console.log(urlCreator.page);
 }
 
-// function getUrl() {
-//   let page = 1;
-//   const searchQuery = refs.formEl.searchQuery.value;
-//   const url = `${BASE_URL}?key=${API_KEY}&q=${searchQuery}&image_type=photo&orientation=horizontal&per_page=10&page=${page}`;
-//   return url;
-// }
-
-// function onLoadMore() {
-//   console.log(searchQuery);
-// }
-
-// const searchParams = {
-//   image_type: 'photo',
-//   orientation: 'horizontal',
-//   safesearch: 'true',
-// };
-//&safesearch=true
-
 async function fetchUrl(targetUrl) {
+  loadMoreButton.hide();
   let data;
   await fetch(targetUrl)
     .then(response => response.json())
     .then(response => {
-      //console.log(response);
+      //console.log(response.totalHits);
       data = [...response.hits];
       return data;
     })
     .then(response => {
       if (response.length === 0) {
-        Notify.failure(
+        loadMoreButton.hide();
+        return Notify.failure(
           'Sorry, there are no images matching your search query. Please try again.',
           notiflixParams
         );
+      } else if (response.length < 40) {
+        loadMoreButton.hide();
+        return Notify.info(
+          "We're sorry, but you've reached the end of search results.",
+          notiflixParams
+        );
       }
+      loadMoreButton.show();
     });
-  //console.log(data);
   return data;
 }
 
@@ -106,23 +75,32 @@ function drawCards(data) {
         </div>`
     )
     .join('');
-  //console.log(markup);
   refs.galleryEl.insertAdjacentHTML('beforeend', markup);
+}
+
+function scroll() {
+  const { height: cardHeight } = document
+    .querySelector('.gallery')
+    .firstElementChild.getBoundingClientRect();
+  window.scrollBy({
+    top: cardHeight * 20,
+    behavior: 'smooth',
+  });
 }
 
 function onFormSubmit(e) {
   e.preventDefault();
   refs.galleryEl.innerHTML = '';
-  loadMoreButton.show();
-  const url = new UrlCreator().getUrl();
-  fetchUrl(url).then(data => {
+  urlCreator.clearPageValue();
+  fetchUrl(urlCreator.getUrl()).then(data => {
     drawCards(data);
-    const { height: cardHeight } = document
-      .querySelector('.gallery')
-      .firstElementChild.getBoundingClientRect();
-    window.scrollBy({
-      top: cardHeight * 20,
-      behavior: 'smooth',
-    });
+    scroll();
   });
 }
+
+// const searchParams = {
+//   image_type: 'photo',
+//   orientation: 'horizontal',
+//   safesearch: 'true',
+// };
+//&safesearch=true
