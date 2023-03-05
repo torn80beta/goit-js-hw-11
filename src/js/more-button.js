@@ -5,6 +5,5 @@ export default class MoreButton {
 
   show() {
     this.button.classList.remove('is-hidden');
-    console.log(this.button);
   }
 }
