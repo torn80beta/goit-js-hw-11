@@ -1,26 +1,25 @@
 import { Notify } from 'notiflix/build/notiflix-notify-aio';
-
+import MoreButton from './js/more-button';
 const API_KEY = '34120463-e7776ce011157a1f3e137c765';
 const BASE_URL = 'https://pixabay.com/api/';
-// const searchParams = {
-//   image_type: 'photo',
-//   orientation: 'horizontal',
-//   safesearch: 'true',
-// };
-
 const refs = {
   formEl: document.querySelector('.search-form'),
   buttonEl: document.querySelector('.button'),
   galleryEl: document.querySelector('.gallery'),
 };
-
 const notiflixParams = {
   position: 'center-top',
   distance: '60px',
 };
+const loadMoreButton = new MoreButton();
 
 refs.formEl.addEventListener('submit', onFormSubmit);
 
+// const searchParams = {
+//   image_type: 'photo',
+//   orientation: 'horizontal',
+//   safesearch: 'true',
+// };
 //&safesearch=true
 
 async function fetchUrl(targetUrl) {
@@ -73,15 +72,17 @@ function drawCards(data) {
 
 function onFormSubmit(e) {
   e.preventDefault();
+  refs.galleryEl.innerHTML = '';
+  loadMoreButton.show();
   const searchQuery = e.currentTarget.searchQuery.value;
-  const url = `${BASE_URL}?key=${API_KEY}&q=${searchQuery}&image_type=photo&orientation=horizontal`;
+  const url = `${BASE_URL}?key=${API_KEY}&q=${searchQuery}&image_type=photo&orientation=horizontal&per_page=10&page=1`;
   fetchUrl(url).then(data => {
     drawCards(data);
     const { height: cardHeight } = document
       .querySelector('.gallery')
       .firstElementChild.getBoundingClientRect();
     window.scrollBy({
-      top: cardHeight * 3,
+      top: cardHeight * 20,
       behavior: 'smooth',
     });
   });
