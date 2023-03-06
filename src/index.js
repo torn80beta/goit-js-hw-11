@@ -24,7 +24,6 @@ function onLoadMore() {
 }
 
 async function fetchUrl(targetUrl) {
-  loadMoreButton.hide();
   let data;
   await fetch(targetUrl)
     .then(response => response.json())
@@ -47,7 +46,6 @@ async function fetchUrl(targetUrl) {
           notiflixParams
         );
       }
-      loadMoreButton.show();
     });
   return data;
 }
@@ -90,10 +88,14 @@ function scroll() {
 
 function onFormSubmit(e) {
   e.preventDefault();
+  loadMoreButton.hide();
   refs.galleryEl.innerHTML = '';
   urlCreator.clearPageValue();
   fetchUrl(urlCreator.getUrl()).then(data => {
+    console.log(data);
+    Notify.success(`Hooray! We found ${data.totalHits} images.`);
     drawCards(data);
+    loadMoreButton.show();
     scroll();
   });
 }
