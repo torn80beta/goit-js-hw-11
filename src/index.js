@@ -127,7 +127,6 @@ function onFormSubmit(e) {
       );
     }
     drawCards(response.hits);
-
     scroll();
   });
 }
