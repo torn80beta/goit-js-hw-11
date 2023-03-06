@@ -9,6 +9,7 @@ const refs = {
 };
 const notiflixParams = {
   position: 'center-center',
+  fontSize: '15px',
 };
 
 refs.formEl.addEventListener('submit', onFormSubmit);
@@ -17,7 +18,7 @@ loadMoreButton.button.addEventListener('click', onLoadMore);
 function onLoadMore() {
   urlCreator.incrementPage();
   fetchUrl(urlCreator.getUrl()).then(data => {
-    drawCards(data);
+    drawCards(data.hits);
     scroll();
   });
   //console.log(urlCreator.page);
@@ -28,24 +29,22 @@ async function fetchUrl(targetUrl) {
   await fetch(targetUrl)
     .then(response => response.json())
     .then(response => {
-      //console.log(response.totalHits);
-      data = [...response.hits];
-      return data;
-    })
-    .then(response => {
-      if (response.length === 0) {
+      data = response;
+      console.log(data);
+      if (response.hits.length === 0) {
         loadMoreButton.hide();
         return Notify.failure(
           'Sorry, there are no images matching your search query. Please try again.',
           notiflixParams
         );
-      } else if (response.length < 40) {
+      } else if (response.hits.length < 40) {
         loadMoreButton.hide();
         return Notify.info(
           "We're sorry, but you've reached the end of search results.",
           notiflixParams
         );
       }
+      loadMoreButton.show();
     });
   return data;
 }
@@ -91,11 +90,15 @@ function onFormSubmit(e) {
   loadMoreButton.hide();
   refs.galleryEl.innerHTML = '';
   urlCreator.clearPageValue();
-  fetchUrl(urlCreator.getUrl()).then(data => {
-    console.log(data);
-    Notify.success(`Hooray! We found ${data.totalHits} images.`);
-    drawCards(data);
-    loadMoreButton.show();
+  fetchUrl(urlCreator.getUrl()).then(response => {
+    const data = [...response.hits];
+    if (response.totalHits > 40) {
+      Notify.success(
+        `Hooray! We found ${response.totalHits} images.`,
+        notiflixParams
+      );
+    }
+    drawCards(response.hits);
     scroll();
   });
 }
