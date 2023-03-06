@@ -37,7 +37,7 @@ async function fetchUrl(targetUrl) {
           'Sorry, there are no images matching your search query. Please try again.',
           notiflixParams
         );
-      } else if (response.hits.length < 40) {
+      } else if (urlCreator.page * 40 >= response.totalHits) {
         loadMoreButton.hide();
         return Notify.info(
           "We're sorry, but you've reached the end of search results.",
@@ -91,7 +91,6 @@ function onFormSubmit(e) {
   refs.galleryEl.innerHTML = '';
   urlCreator.clearPageValue();
   fetchUrl(urlCreator.getUrl()).then(response => {
-    const data = [...response.hits];
     if (response.totalHits > 40) {
       Notify.success(
         `Hooray! We found ${response.totalHits} images.`,
