@@ -30,7 +30,6 @@ async function fetchUrl(targetUrl) {
     .then(response => response.json())
     .then(response => {
       data = response;
-      console.log(data);
       if (response.hits.length === 0) {
         loadMoreButton.hide();
         return Notify.failure(
