@@ -12,8 +12,9 @@ const refs = {
   upButtonEl: document.querySelector('.up-button'),
 };
 const notiflixParams = {
-  position: 'center-center',
-  fontSize: '15px',
+  position: 'right-top',
+  fontSize: '14px',
+  distance: '0px',
 };
 
 let gallery = new SimpleLightbox('.gallery a', {
@@ -47,7 +48,7 @@ async function fetchUrl(targetUrl) {
         loadMoreButton.hide();
         return Notify.failure(
           'Sorry, there are no images matching your search query. Please try again.',
-          notiflixParams
+          { ...notiflixParams, position: 'center-center' }
         );
       } else if (urlCreator.page * 40 >= response.totalHits) {
         loadMoreButton.hide();
