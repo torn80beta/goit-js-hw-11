@@ -1,16 +1,28 @@
 import { Notify } from 'notiflix/build/notiflix-notify-aio';
 import MoreButton from './js/more-button';
 import UrlCreator from './js/url-creator';
+import SimpleLightbox from 'simplelightbox';
+import 'simplelightbox/dist/simple-lightbox.min.css';
+
 const loadMoreButton = new MoreButton();
 const urlCreator = new UrlCreator();
 const refs = {
   formEl: document.querySelector('.search-form'),
   galleryEl: document.querySelector('.gallery'),
+  upButtonEl: document.querySelector('.up-button'),
 };
 const notiflixParams = {
   position: 'center-center',
   fontSize: '15px',
 };
+
+let gallery = new SimpleLightbox('.gallery a', {
+  captions: true,
+  captionsData: 'alt',
+  captionPosition: 'bottom',
+  captionDelay: 250,
+  scrollZoom: false,
+});
 
 refs.formEl.addEventListener('submit', onFormSubmit);
 loadMoreButton.button.addEventListener('click', onLoadMore);
@@ -30,6 +42,7 @@ async function fetchUrl(targetUrl) {
     .then(response => response.json())
     .then(response => {
       data = response;
+      //console.log(data.hits);
       if (response.hits.length === 0) {
         loadMoreButton.hide();
         return Notify.failure(
@@ -51,9 +64,19 @@ async function fetchUrl(targetUrl) {
 function drawCards(data) {
   const markup = data
     .map(
-      ({ webformatURL, tags, likes, views, comments, downloads }) =>
+      ({
+        webformatURL,
+        tags,
+        likes,
+        views,
+        comments,
+        downloads,
+        largeImageURL,
+      }) =>
         `<div class="photo-card">
-                <img class="image" src="${webformatURL}" alt="${tags}" loading="lazy" />
+          <a href="${largeImageURL}">
+            <img class="image" src="${webformatURL}" alt="${tags}" loading="lazy" />
+          </a>
             <div class="info">
                 <p class="info-item">
                 <b>Likes: ${likes}</b>
@@ -68,10 +91,17 @@ function drawCards(data) {
                 <b>Downloads: ${downloads}</b>
                 </p>
             </div>
-        </div>`
+          </div>`
     )
     .join('');
   refs.galleryEl.insertAdjacentHTML('beforeend', markup);
+  gallery.refresh();
+  gallery.on('show.simplelightbox', function () {
+    refs.upButtonEl.classList.add('is-hidden');
+  });
+  gallery.on('closed.simplelightbox', function () {
+    refs.upButtonEl.classList.remove('is-hidden');
+  });
 }
 
 function scroll() {
@@ -97,6 +127,7 @@ function onFormSubmit(e) {
       );
     }
     drawCards(response.hits);
+
     scroll();
   });
 }
