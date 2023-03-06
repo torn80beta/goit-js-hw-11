@@ -97,12 +97,6 @@ function drawCards(data) {
     .join('');
   refs.galleryEl.insertAdjacentHTML('beforeend', markup);
   gallery.refresh();
-  gallery.on('show.simplelightbox', function () {
-    refs.upButtonEl.classList.add('is-hidden');
-  });
-  gallery.on('closed.simplelightbox', function () {
-    refs.upButtonEl.classList.remove('is-hidden');
-  });
 }
 
 function scroll() {
