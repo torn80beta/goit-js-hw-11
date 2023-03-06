@@ -3,6 +3,7 @@ import MoreButton from './js/more-button';
 import UrlCreator from './js/url-creator';
 import SimpleLightbox from 'simplelightbox';
 import 'simplelightbox/dist/simple-lightbox.min.css';
+const axios = require('axios').default;
 
 const loadMoreButton = new MoreButton();
 const urlCreator = new UrlCreator();
@@ -28,6 +29,23 @@ let gallery = new SimpleLightbox('.gallery a', {
 refs.formEl.addEventListener('submit', onFormSubmit);
 loadMoreButton.button.addEventListener('click', onLoadMore);
 
+function onFormSubmit(e) {
+  e.preventDefault();
+  loadMoreButton.hide();
+  refs.galleryEl.innerHTML = '';
+  urlCreator.clearPageValue();
+  fetchUrl(urlCreator.getUrl()).then(response => {
+    if (response.totalHits > 40) {
+      Notify.success(
+        `Hooray! We found ${response.totalHits} images.`,
+        notiflixParams
+      );
+    }
+    drawCards(response.hits);
+    scroll();
+  });
+}
+
 function onLoadMore() {
   urlCreator.incrementPage();
   fetchUrl(urlCreator.getUrl()).then(data => {
@@ -39,18 +57,16 @@ function onLoadMore() {
 
 async function fetchUrl(targetUrl) {
   let data;
-  await fetch(targetUrl)
-    .then(response => response.json())
-    .then(response => {
-      data = response;
-      //console.log(data.hits);
-      if (response.hits.length === 0) {
+  try {
+    const response = await axios.get(targetUrl).then(response => {
+      data = response.data;
+      if (response.data.hits.length === 0) {
         loadMoreButton.hide();
         return Notify.failure(
           'Sorry, there are no images matching your search query. Please try again.',
           { ...notiflixParams, position: 'center-center' }
         );
-      } else if (urlCreator.page * 40 >= response.totalHits) {
+      } else if (urlCreator.page * 40 >= response.data.totalHits) {
         loadMoreButton.hide();
         return Notify.info(
           "We're sorry, but you've reached the end of search results.",
@@ -59,7 +75,10 @@ async function fetchUrl(targetUrl) {
       }
       loadMoreButton.show();
     });
-  return data;
+    return data;
+  } catch (error) {
+    console.error(error);
+  }
 }
 
 function drawCards(data) {
@@ -106,23 +125,6 @@ function scroll() {
   window.scrollBy({
     top: cardHeight * 20,
     behavior: 'smooth',
-  });
-}
-
-function onFormSubmit(e) {
-  e.preventDefault();
-  loadMoreButton.hide();
-  refs.galleryEl.innerHTML = '';
-  urlCreator.clearPageValue();
-  fetchUrl(urlCreator.getUrl()).then(response => {
-    if (response.totalHits > 40) {
-      Notify.success(
-        `Hooray! We found ${response.totalHits} images.`,
-        notiflixParams
-      );
-    }
-    drawCards(response.hits);
-    scroll();
   });
 }
 
