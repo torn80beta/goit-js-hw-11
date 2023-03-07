@@ -13,9 +13,10 @@ const refs = {
   upButtonEl: document.querySelector('.up-button'),
 };
 const notiflixParams = {
-  position: 'right-top',
+  position: 'center-center',
+  cssAnimationStyle: 'from-left',
   fontSize: '14px',
-  distance: '0px',
+  distance: '1px',
 };
 
 let gallery = new SimpleLightbox('.gallery a', {
@@ -36,14 +37,15 @@ function onFormSubmit(e) {
   urlCreator.clearPageValue();
   urlCreator.getQuery();
   if (urlCreator.searchQuery === '') {
+    Notify.warning('Enter your search parameters, please.', notiflixParams);
     return;
   } else {
     fetchUrl(urlCreator.getUrl()).then(response => {
       if (response.totalHits > 40) {
-        Notify.success(
-          `Hooray! We found ${response.totalHits} images.`,
-          notiflixParams
-        );
+        Notify.success(`Hooray! We found ${response.totalHits} images.`, {
+          ...notiflixParams,
+          position: 'left-top',
+        });
       }
       drawCards(response.hits);
       scroll();
