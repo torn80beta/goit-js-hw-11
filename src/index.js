@@ -34,16 +34,21 @@ function onFormSubmit(e) {
   loadMoreButton.hide();
   refs.galleryEl.innerHTML = '';
   urlCreator.clearPageValue();
-  fetchUrl(urlCreator.getUrl()).then(response => {
-    if (response.totalHits > 40) {
-      Notify.success(
-        `Hooray! We found ${response.totalHits} images.`,
-        notiflixParams
-      );
-    }
-    drawCards(response.hits);
-    scroll();
-  });
+  urlCreator.getQuery();
+  if (urlCreator.searchQuery === '') {
+    return;
+  } else {
+    fetchUrl(urlCreator.getUrl()).then(response => {
+      if (response.totalHits > 40) {
+        Notify.success(
+          `Hooray! We found ${response.totalHits} images.`,
+          notiflixParams
+        );
+      }
+      drawCards(response.hits);
+      scroll();
+    });
+  }
 }
 
 function onLoadMore() {
