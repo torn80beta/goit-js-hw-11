@@ -3,10 +3,10 @@ import MoreButton from './js/more-button';
 import UrlCreator from './js/url-creator';
 import SimpleLightbox from 'simplelightbox';
 import 'simplelightbox/dist/simple-lightbox.min.css';
-const axios = require('axios').default;
 
-const loadMoreButton = new MoreButton();
+const axios = require('axios').default;
 const urlCreator = new UrlCreator();
+const loadMoreButton = new MoreButton();
 const refs = {
   formEl: document.querySelector('.search-form'),
   galleryEl: document.querySelector('.gallery'),
@@ -36,7 +36,7 @@ function onFormSubmit(e) {
   refs.galleryEl.innerHTML = '';
   urlCreator.clearPageValue();
   urlCreator.getQuery();
-  if (urlCreator.searchQuery === '') {
+  if (!urlCreator.searchQuery) {
     Notify.warning('Enter your search parameters, please.', notiflixParams);
     return;
   } else {
@@ -48,7 +48,6 @@ function onFormSubmit(e) {
         });
       }
       drawCards(response.hits);
-      scroll();
     });
   }
 }
@@ -59,7 +58,6 @@ function onLoadMore() {
     drawCards(data.hits);
     scroll();
   });
-  //console.log(urlCreator.page);
 }
 
 async function fetchUrl(targetUrl) {
@@ -131,7 +129,7 @@ function scroll() {
       .querySelector('.gallery')
       .firstElementChild.getBoundingClientRect();
     window.scrollBy({
-      top: cardHeight * 20,
+      top: cardHeight * 2.2,
       behavior: 'smooth',
     });
   } catch (error) {
